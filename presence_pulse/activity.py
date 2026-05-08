@@ -108,20 +108,26 @@ def run_presence_pulse(config: PresencePulseConfig) -> None:
     warn_if_unsupported_platform(config.logging_enabled)
 
     pyautogui = get_pyautogui()
-    pyautogui.FAILSAFE = True
+    pyautogui.FAILSAFE = config.fail_safe_enabled
 
     if config.keyboard_enabled:
         log(
             "warning: keyboard activity is enabled and may affect the active app",
             config.logging_enabled,
         )
-    elif not config.safe_mode:
+    if not config.fail_safe_enabled:
+        log(
+            "warning: PyAutoGUI fail-safe is disabled",
+            config.logging_enabled,
+        )
+    if not config.safe_mode:
         log("warning: safe mode is disabled", config.logging_enabled)
 
     log(
         "PresencePulse started "
         f"(interval: {config.min_interval_seconds:.0f}-"
         f"{config.max_interval_seconds:.0f}s, safe_mode: {config.safe_mode}, "
+        f"fail_safe_enabled: {config.fail_safe_enabled}, "
         f"keyboard_enabled: {config.keyboard_enabled})",
         config.logging_enabled,
     )
@@ -132,5 +138,7 @@ def run_presence_pulse(config: PresencePulseConfig) -> None:
             time.sleep(wait_seconds)
             trigger_activity(config)
             log("activity triggered", config.logging_enabled)
+    except pyautogui.FailSafeException:
+        log("PresencePulse stopped by PyAutoGUI fail-safe", config.logging_enabled)
     except KeyboardInterrupt:
         log("PresencePulse stopped", config.logging_enabled)

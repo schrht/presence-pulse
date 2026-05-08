@@ -14,6 +14,7 @@ class PresencePulseConfig:
     max_interval_seconds: float = 90.0
     logging_enabled: bool = True
     safe_mode: bool = True
+    fail_safe_enabled: bool = True
     keyboard_enabled: bool = False
     keyboard_keys: Tuple[str, ...] = ()
 

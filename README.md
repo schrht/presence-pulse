@@ -40,6 +40,7 @@ Available arguments:
 - `--max-interval`: maximum seconds between activity events.
 - `--quiet`: disables timestamped logs.
 - `--unsafe`: disables safe mode. Required before keyboard activity can be enabled.
+- `--disable-fail-safe`: disables PyAutoGUI's screen-corner emergency stop.
 - `--enable-keyboard`: also simulates a configured keyboard series.
 - `--keys`: comma-separated key series for keyboard simulation, such as `shift`, `shift,shift`, or `cmd+tab`.
 
@@ -76,7 +77,7 @@ uv run python main.py --help
 Example log output:
 
 ```text
-[2026-04-10 10:30:21] PresencePulse started (interval: 40-90s, safe_mode: True)
+[2026-04-10 10:30:21] PresencePulse started (interval: 40-90s, safe_mode: True, fail_safe_enabled: True, keyboard_enabled: False)
 [2026-04-10 10:31:14] activity triggered
 [2026-04-10 10:32:30] activity triggered
 [2026-04-10 10:32:42] PresencePulse stopped
@@ -92,6 +93,7 @@ DEFAULT_CONFIG = PresencePulseConfig(
     max_interval_seconds=90.0,
     logging_enabled=True,
     safe_mode=True,
+    fail_safe_enabled=True,
     keyboard_enabled=False,
     keyboard_keys=(),
 )
@@ -103,6 +105,7 @@ Available options:
 - `max_interval_seconds`: longest delay between activity events.
 - `logging_enabled`: enables timestamped console logs.
 - `safe_mode`: keeps the tool mouse-only. Keyboard activity is intentionally not used.
+- `fail_safe_enabled`: enables PyAutoGUI's screen-corner emergency stop.
 - `keyboard_enabled`: enables the configured keyboard series when safe mode is disabled.
 - `keyboard_keys`: keys or hotkey chords to press in order, such as `("shift",)`, `("shift", "shift")`, or `("cmd+tab",)`.
 
@@ -127,7 +130,8 @@ PresencePulse is designed to be subtle:
 - It does not send keyboard input by default.
 - Keyboard simulation is opt-in and requires safe mode to be disabled.
 - It uses randomized intervals to avoid a rigid activity pattern.
-- It enables `pyautogui` fail-safe behavior, so moving the pointer to a screen corner can abort pyautogui actions.
+- It enables `pyautogui` fail-safe behavior, so moving the pointer to a screen corner stops PresencePulse cleanly.
+- You can disable the fail-safe with `--disable-fail-safe`, but this removes PyAutoGUI's screen-corner emergency stop.
 
 Limitations:
 

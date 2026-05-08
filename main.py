@@ -35,6 +35,11 @@ def parse_args() -> argparse.Namespace:
         help="Disable safe mode. Required before keyboard activity can be enabled.",
     )
     parser.add_argument(
+        "--disable-fail-safe",
+        action="store_true",
+        help="Disable PyAutoGUI's screen-corner emergency stop.",
+    )
+    parser.add_argument(
         "--enable-keyboard",
         action="store_true",
         help="Also simulate a configured keyboard series.",
@@ -69,6 +74,7 @@ def config_from_args(args: argparse.Namespace) -> PresencePulseConfig:
         max_interval_seconds=args.max_interval,
         logging_enabled=not args.quiet,
         safe_mode=not args.unsafe,
+        fail_safe_enabled=not args.disable_fail_safe,
         keyboard_enabled=args.enable_keyboard,
         keyboard_keys=parse_key_series(args.keys),
     )
