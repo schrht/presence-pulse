@@ -48,6 +48,8 @@ def validate_config(config: PresencePulseConfig) -> None:
         raise ValueError("min_interval_seconds cannot exceed max_interval_seconds")
     if config.safe_mode and config.keyboard_enabled:
         raise ValueError("keyboard activity cannot be enabled in safe mode")
+    if not config.mouse_enabled and not config.keyboard_enabled:
+        raise ValueError("at least one activity type must be enabled")
     if config.keyboard_enabled and not config.keyboard_keys:
         raise ValueError("keyboard_keys must contain at least one key")
 
@@ -65,8 +67,8 @@ def warn_if_unsupported_platform(logging_enabled: bool = True) -> None:
 def trigger_mouse_activity() -> None:
     """Generate minimal reversible mouse movement."""
     pyautogui = get_pyautogui()
-    pyautogui.moveRel(-1, 0, duration=0)
     pyautogui.moveRel(1, 0, duration=0)
+    pyautogui.moveRel(-1, 0, duration=0)
 
 
 def trigger_keyboard_activity(keys: Sequence[str]) -> None:
@@ -91,7 +93,8 @@ def parse_key_action(key_spec: str) -> tuple[str, ...]:
 
 def trigger_activity(config: PresencePulseConfig) -> None:
     """Generate the configured activity event."""
-    trigger_mouse_activity()
+    if config.mouse_enabled:
+        trigger_mouse_activity()
 
     if config.keyboard_enabled:
         trigger_keyboard_activity(config.keyboard_keys)
@@ -128,6 +131,7 @@ def run_presence_pulse(config: PresencePulseConfig) -> None:
         f"(interval: {config.min_interval_seconds:.0f}-"
         f"{config.max_interval_seconds:.0f}s, safe_mode: {config.safe_mode}, "
         f"fail_safe_enabled: {config.fail_safe_enabled}, "
+        f"mouse_enabled: {config.mouse_enabled}, "
         f"keyboard_enabled: {config.keyboard_enabled})",
         config.logging_enabled,
     )

@@ -15,6 +15,7 @@ class PresencePulseConfig:
     logging_enabled: bool = True
     safe_mode: bool = True
     fail_safe_enabled: bool = True
+    mouse_enabled: bool = False
     keyboard_enabled: bool = False
     keyboard_keys: Tuple[str, ...] = ()
 

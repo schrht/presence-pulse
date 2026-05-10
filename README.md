@@ -2,7 +2,7 @@
 
 PresencePulse is a lightweight, generic macOS-friendly utility that generates minimal periodic user activity. It is not tied to any specific application. It is intended for passive workflows such as reading, monitoring logs, or waiting for long-running tasks while keeping the machine from entering an idle state.
 
-By default, PresencePulse uses `pyautogui` to move the mouse by 1 pixel and immediately move it back. It avoids keyboard input by default to reduce the chance of interfering with normal work.
+PresencePulse can use `pyautogui` to move the mouse by 1 pixel and immediately move it back, send a configured keyboard series, or both. At least one activity type must be enabled explicitly.
 
 ## Installation
 
@@ -23,7 +23,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Run the utility from the project root:
 
 ```bash
-uv run python main.py
+uv run python main.py --enable-mouse
 ```
 
 PresencePulse runs indefinitely until interrupted. Stop it with `Ctrl+C`.
@@ -41,8 +41,15 @@ Available arguments:
 - `--quiet`: disables timestamped logs.
 - `--unsafe`: disables safe mode. Required before keyboard activity can be enabled.
 - `--disable-fail-safe`: disables PyAutoGUI's screen-corner emergency stop.
+- `--enable-mouse`: simulates minimal reversible mouse movement.
 - `--enable-keyboard`: also simulates a configured keyboard series.
 - `--keys`: comma-separated key series for keyboard simulation, such as `shift`, `shift,shift`, or `cmd+tab`.
+
+Mouse and keyboard simulation are both disabled by default. Enable at least one activity type:
+
+```bash
+uv run python main.py --enable-mouse
+```
 
 Keyboard simulation is disabled by default. To enable it, you must disable safe mode explicitly:
 
@@ -77,7 +84,7 @@ uv run python main.py --help
 Example log output:
 
 ```text
-[2026-04-10 10:30:21] PresencePulse started (interval: 40-90s, safe_mode: True, fail_safe_enabled: True, keyboard_enabled: False)
+[2026-04-10 10:30:21] PresencePulse started (interval: 40-90s, safe_mode: True, fail_safe_enabled: True, mouse_enabled: True, keyboard_enabled: False)
 [2026-04-10 10:31:14] activity triggered
 [2026-04-10 10:32:30] activity triggered
 [2026-04-10 10:32:42] PresencePulse stopped
@@ -94,6 +101,7 @@ DEFAULT_CONFIG = PresencePulseConfig(
     logging_enabled=True,
     safe_mode=True,
     fail_safe_enabled=True,
+    mouse_enabled=False,
     keyboard_enabled=False,
     keyboard_keys=(),
 )
@@ -104,8 +112,9 @@ Available options:
 - `min_interval_seconds`: shortest delay between activity events.
 - `max_interval_seconds`: longest delay between activity events.
 - `logging_enabled`: enables timestamped console logs.
-- `safe_mode`: keeps the tool mouse-only. Keyboard activity is intentionally not used.
+- `safe_mode`: prevents keyboard activity unless disabled explicitly.
 - `fail_safe_enabled`: enables PyAutoGUI's screen-corner emergency stop.
+- `mouse_enabled`: enables minimal reversible mouse movement.
 - `keyboard_enabled`: enables the configured keyboard series when safe mode is disabled.
 - `keyboard_keys`: keys or hotkey chords to press in order, such as `("shift",)`, `("shift", "shift")`, or `("cmd+tab",)`.
 
@@ -127,7 +136,7 @@ You may need to restart the terminal after granting permission.
 PresencePulse is designed to be subtle:
 
 - It moves the mouse by only 1 pixel and immediately restores the original position.
-- It does not send keyboard input by default.
+- Mouse and keyboard activity are both opt-in.
 - Keyboard simulation is opt-in and requires safe mode to be disabled.
 - It uses randomized intervals to avoid a rigid activity pattern.
 - It enables `pyautogui` fail-safe behavior, so moving the pointer to a screen corner stops PresencePulse cleanly.

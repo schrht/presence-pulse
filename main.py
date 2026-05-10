@@ -40,6 +40,11 @@ def parse_args() -> argparse.Namespace:
         help="Disable PyAutoGUI's screen-corner emergency stop.",
     )
     parser.add_argument(
+        "--enable-mouse",
+        action="store_true",
+        help="Simulate minimal reversible mouse movement.",
+    )
+    parser.add_argument(
         "--enable-keyboard",
         action="store_true",
         help="Also simulate a configured keyboard series.",
@@ -55,9 +60,11 @@ def parse_args() -> argparse.Namespace:
     args = parser.parse_args()
 
     if args.enable_keyboard and not args.unsafe:
-        parser.error("--enable-keyboard requires --unsafe because safe mode is mouse-only")
+        parser.error("--enable-keyboard requires --unsafe because safe mode disables keyboard activity")
     if args.enable_keyboard and not parse_key_series(args.keys):
         parser.error("--enable-keyboard requires --keys with at least one key")
+    if not args.enable_mouse and not args.enable_keyboard:
+        parser.error("at least one activity type must be enabled: --enable-mouse or --enable-keyboard")
 
     return args
 
@@ -75,6 +82,7 @@ def config_from_args(args: argparse.Namespace) -> PresencePulseConfig:
         logging_enabled=not args.quiet,
         safe_mode=not args.unsafe,
         fail_safe_enabled=not args.disable_fail_safe,
+        mouse_enabled=args.enable_mouse,
         keyboard_enabled=args.enable_keyboard,
         keyboard_keys=parse_key_series(args.keys),
     )
