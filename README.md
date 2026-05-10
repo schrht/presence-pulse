@@ -50,7 +50,7 @@ Mouse and keyboard simulation are both disabled by default. Enable at least one 
 uv run python main.py --enable-mouse
 ```
 
-Keyboard simulation is disabled by default. To enable it, provide a key series explicitly:
+Keyboard simulation is disabled by default. When enabled, it presses `shift` unless you provide a different key series:
 
 ```bash
 uv run python main.py --enable-keyboard --keys shift
@@ -83,7 +83,7 @@ uv run python main.py --help
 Example log output:
 
 ```text
-[2026-04-10 10:30:21] PresencePulse started (interval: 40-90s, fail_safe_enabled: True, mouse_enabled: True, keyboard_enabled: False)
+[2026-04-10 10:30:21] PresencePulse started (interval: 60-90s, fail_safe_enabled: True, mouse_enabled: True, keyboard_enabled: False)
 [2026-04-10 10:31:14] activity triggered
 [2026-04-10 10:32:30] activity triggered
 [2026-04-10 10:32:42] PresencePulse stopped
@@ -95,13 +95,13 @@ Configuration lives in `presence_pulse/config.py`:
 
 ```python
 DEFAULT_CONFIG = PresencePulseConfig(
-    min_interval_seconds=40.0,
+    min_interval_seconds=60.0,
     max_interval_seconds=90.0,
     logging_enabled=True,
     fail_safe_enabled=True,
     mouse_enabled=False,
     keyboard_enabled=False,
-    keyboard_keys=(),
+    keyboard_keys=("shift",),
 )
 ```
 

@@ -103,6 +103,15 @@ def random_interval(config: PresencePulseConfig) -> float:
     return random.uniform(config.min_interval_seconds, config.max_interval_seconds)
 
 
+def format_interval(config: PresencePulseConfig) -> str:
+    """Format interval bounds for startup logging."""
+    min_interval = f"{config.min_interval_seconds:.0f}"
+    max_interval = f"{config.max_interval_seconds:.0f}"
+    if config.min_interval_seconds == config.max_interval_seconds:
+        return f"{min_interval}s"
+    return f"{min_interval}-{max_interval}s"
+
+
 def run_presence_pulse(config: PresencePulseConfig) -> None:
     """Run the activity loop until interrupted."""
     validate_config(config)
@@ -124,8 +133,7 @@ def run_presence_pulse(config: PresencePulseConfig) -> None:
 
     log(
         "PresencePulse started "
-        f"(interval: {config.min_interval_seconds:.0f}-"
-        f"{config.max_interval_seconds:.0f}s, "
+        f"(interval: {format_interval(config)}, "
         f"fail_safe_enabled: {config.fail_safe_enabled}, "
         f"mouse_enabled: {config.mouse_enabled}, "
         f"keyboard_enabled: {config.keyboard_enabled})",

@@ -11,6 +11,7 @@ def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Generate minimal periodic user activity.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "--min-interval",
@@ -46,7 +47,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--keys",
-        default="",
+        default=",".join(DEFAULT_CONFIG.keyboard_keys),
         help=(
             "Comma-separated key series for keyboard simulation, "
             "such as 'shift', 'shift,shift', or 'cmd+tab'."
@@ -54,6 +55,15 @@ def parse_args() -> argparse.Namespace:
     )
     args = parser.parse_args()
 
+    if args.min_interval <= 0:
+        parser.error(f"--min-interval must be greater than 0 (got {args.min_interval:g})")
+    if args.max_interval <= 0:
+        parser.error(f"--max-interval must be greater than 0 (got {args.max_interval:g})")
+    if args.min_interval > args.max_interval:
+        parser.error(
+            "--min-interval cannot exceed --max-interval "
+            f"(got --min-interval {args.min_interval:g}, --max-interval {args.max_interval:g})"
+        )
     if args.enable_keyboard and not parse_key_series(args.keys):
         parser.error("--enable-keyboard requires --keys with at least one key")
     if not args.enable_mouse and not args.enable_keyboard:
